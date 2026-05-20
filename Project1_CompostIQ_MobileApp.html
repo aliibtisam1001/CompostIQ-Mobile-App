@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CompostIQ — Smart Composting App</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+  :root {
+    --green-dark: #1a3d2b;
+    --green-mid: #2d6a4f;
+    --green-accent: #40916c;
+    --green-light: #74c69d;
+    --green-pale: #b7e4c7;
+    --cream: #f8f5f0;
+    --orange: #e07a3b;
+    --blue: #3b82f6;
+    --red: #ef4444;
+    --text: #1c1c1e;
+    --text-sub: #6b7280;
+    --card: #ffffff;
+    --bg: #f0f4f1;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 50px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,255,255,0.1);
+    overflow: hidden;
+    position: relative;
+    border: 8px solid #111;
+  }
+
+  .status-bar {
+    background: var(--green-dark);
+    height: 44px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 24px 8px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .screen { display: none; height: calc(100% - 44px); overflow-y: auto; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===== HOME SCREEN ===== */
+  .home-header {
+    background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-mid) 100%);
+    padding: 20px 24px 28px;
+    color: white;
+  }
+
+  .home-header .greeting { font-size: 13px; opacity: 0.7; margin-bottom: 4px; }
+  .home-header h1 { font-size: 22px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+
+  .header-stats {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .hstat {
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 10px 14px;
+    flex: 1;
+    backdrop-filter: blur(10px);
+  }
+  .hstat .val { font-size: 20px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .hstat .lbl { font-size: 10px; opacity: 0.7; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .section { padding: 16px 20px 0; }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .section-title .see-all { font-size: 12px; font-weight: 500; color: var(--green-accent); }
+
+  .sensor-cards { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+  .sensor-cards::-webkit-scrollbar { display: none; }
+
+  .sensor-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 14px;
+    min-width: 130px;
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+  }
+  .sensor-card .s-icon { font-size: 22px; margin-bottom: 6px; }
+  .sensor-card .s-val { font-size: 20px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: var(--text); }
+  .sensor-card .s-lbl { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+  .sensor-card .s-status {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 99px;
+    margin-top: 6px;
+  }
+  .status-ok { background: #dcfce7; color: #16a34a; }
+  .status-warn { background: #fef9c3; color: #ca8a04; }
+  .status-alert { background: #fee2e2; color: #dc2626; }
+
+  .ai-card {
+    background: linear-gradient(135deg, var(--green-dark), var(--green-accent));
+    border-radius: 16px;
+    padding: 16px;
+    color: white;
+    margin: 0 20px;
+    box-shadow: 0 4px 20px rgba(64,145,108,0.3);
+  }
+  .ai-card .ai-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-bottom: 6px; }
+  .ai-card .ai-msg { font-size: 14px; line-height: 1.5; }
+  .ai-card .ai-action {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 99px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  .activity-list { margin: 0 20px; }
+  .activity-item {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .act-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .act-icon.green { background: #dcfce7; }
+  .act-icon.orange { background: #fff7ed; }
+  .act-icon.blue { background: #eff6ff; }
+  .act-info { flex: 1; }
+  .act-info .act-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .act-info .act-sub { font-size: 11px; color: var(--text-sub); margin-top: 1px; }
+  .act-time { font-size: 10px; color: var(--text-sub); }
+
+  /* ===== ANALYTICS SCREEN ===== */
+  .analytics-header {
+    background: linear-gradient(160deg, #1a3d2b, #2d6a4f);
+    padding: 20px 24px 24px;
+    color: white;
+  }
+  .analytics-header h2 { font-size: 20px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .analytics-header p { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+
+  .chart-card {
+    background: var(--card);
+    border-radius: 16px;
+    margin: 0 20px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .chart-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; font-family: 'Space Grotesk', sans-serif; }
+
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar {
+    width: 100%;
+    background: var(--green-light);
+    border-radius: 6px 6px 0 0;
+    transition: all 0.3s;
+    min-height: 4px;
+  }
+  .bar.highlight { background: var(--green-accent); }
+  .bar-label { font-size: 9px; color: var(--text-sub); }
+  .bar-val { font-size: 9px; font-weight: 600; color: var(--text-sub); }
+
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 20px; }
+  .metric-box {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: var(--shadow);
+  }
+  .metric-box .m-val { font-size: 24px; font-weight: 700; color: var(--green-accent); font-family: 'Space Grotesk', sans-serif; }
+  .metric-box .m-lbl { font-size: 11px; color: var(--text-sub); margin-top: 2px; }
+  .metric-box .m-trend { font-size: 11px; color: #16a34a; margin-top: 4px; font-weight: 600; }
+
+  /* ===== IoT SCREEN ===== */
+  .iot-header {
+    background: linear-gradient(160deg, #1a3d2b, #2d6a4f);
+    padding: 20px 24px 24px;
+    color: white;
+  }
+  .iot-header h2 { font-size: 20px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .device-card {
+    background: var(--card);
+    border-radius: 16px;
+    margin: 0 20px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .device-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .device-name { font-size: 14px; font-weight: 700; color: var(--text); font-family: 'Space Grotesk', sans-serif; }
+  .device-badge {
+    background: #dcfce7; color: #16a34a;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 99px;
+  }
+  .sensor-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+  .sensor-row:last-child { border-bottom: none; }
+  .sensor-name { font-size: 12px; color: var(--text-sub); }
+  .sensor-reading { display: flex; align-items: center; gap: 6px; }
+  .sensor-reading .val { font-size: 14px; font-weight: 700; color: var(--text); font-family: 'Space Grotesk', sans-serif; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot.ok { background: #22c55e; }
+  .dot.warn { background: #f59e0b; }
+  .dot.bad { background: #ef4444; }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    background: var(--card);
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    padding: 10px 0 20px;
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-top: auto;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-icon { font-size: 22px; line-height: 1; }
+  .nav-label { font-size: 10px; font-weight: 600; color: var(--text-sub); }
+  .nav-item.active .nav-label { color: var(--green-accent); }
+
+  /* progress ring */
+  .progress-ring { position: relative; width: 80px; height: 80px; margin: 0 auto; }
+  .progress-ring svg { transform: rotate(-90deg); }
+  .progress-ring .ring-bg { fill: none; stroke: #e5e7eb; stroke-width: 6; }
+  .progress-ring .ring-fill { fill: none; stroke: var(--green-accent); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 220; stroke-dashoffset: 55; transition: stroke-dashoffset 1s ease; }
+  .progress-ring .center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .progress-ring .pct { font-size: 18px; font-weight: 700; color: var(--text); font-family: 'Space Grotesk', sans-serif; }
+  .progress-ring .sub { font-size: 9px; color: var(--text-sub); }
+
+  /* ===== AI CHAT SCREEN ===== */
+  .chat-header {
+    background: linear-gradient(160deg, #1a3d2b, #2d6a4f);
+    padding: 20px 24px;
+    color: white;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chat-avatar {
+    width: 40px; height: 40px; background: rgba(255,255,255,0.2);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .chat-body { flex: 1; padding: 16px 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  .bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5; }
+  .bubble.bot { background: var(--card); color: var(--text); border-bottom-left-radius: 4px; box-shadow: var(--shadow); align-self: flex-start; }
+  .bubble.user { background: var(--green-accent); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .chat-input { display: flex; gap: 8px; padding: 12px 20px; background: var(--card); border-top: 1px solid #e5e7eb; }
+  .chat-input input { flex: 1; border: 1.5px solid #e5e7eb; border-radius: 99px; padding: 8px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .chat-input input:focus { border-color: var(--green-accent); }
+  .chat-send { background: var(--green-accent); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+  .spacer-bottom { height: 16px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>📶 🔋</span>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div class="screen active" id="screen-home">
+    <div class="home-header">
+      <div class="greeting">Good morning, Ali 👋</div>
+      <h1>CompostIQ Dashboard</h1>
+      <div class="header-stats">
+        <div class="hstat">
+          <div class="val">3</div>
+          <div class="lbl">Active Bins</div>
+        </div>
+        <div class="hstat">
+          <div class="val">82%</div>
+          <div class="lbl">Avg Health</div>
+        </div>
+        <div class="hstat">
+          <div class="val">1</div>
+          <div class="lbl">Alert</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Live Sensors <span class="see-all">See All</span></div>
+    </div>
+    <div class="section-cards">
+      <div class="sensor-cards" style="padding: 0 20px;">
+        <div class="sensor-card">
+          <div class="s-icon">🌡️</div>
+          <div class="s-val">54°C</div>
+          <div class="s-lbl">Temperature</div>
+          <span class="s-status status-ok">Optimal</span>
+        </div>
+        <div class="sensor-card">
+          <div class="s-icon">💧</div>
+          <div class="s-val">61%</div>
+          <div class="s-lbl">Moisture</div>
+          <span class="s-status status-ok">Good</span>
+        </div>
+        <div class="sensor-card">
+          <div class="s-icon">🧪</div>
+          <div class="s-val">6.8</div>
+          <div class="s-lbl">pH Level</div>
+          <span class="s-status status-warn">Monitor</span>
+        </div>
+        <div class="sensor-card">
+          <div class="s-icon">💨</div>
+          <div class="s-val">CO₂</div>
+          <div class="s-lbl">Gas Level</div>
+          <span class="s-status status-alert">High</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title" style="margin-bottom: 10px;">AI Recommendation</div>
+    </div>
+    <div class="ai-card">
+      <div class="ai-title">🤖 Smart Insight</div>
+      <div class="ai-msg">Bin #2 CO₂ is elevated. Turn compost and reduce green material by 20% for 3 days. Predicted ready: June 4.</div>
+      <button class="ai-action">View Action Plan →</button>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Recent Activity</div>
+    </div>
+    <div class="activity-list">
+      <div class="activity-item">
+        <div class="act-icon green">🌿</div>
+        <div class="act-info">
+          <div class="act-title">Material added — Bin #1</div>
+          <div class="act-sub">2.5 kg kitchen scraps</div>
+        </div>
+        <div class="act-time">2h ago</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon orange">🔄</div>
+        <div class="act-info">
+          <div class="act-title">Compost turned — Bin #2</div>
+          <div class="act-sub">Temp dropped 8°C after turn</div>
+        </div>
+        <div class="act-time">5h ago</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-icon blue">📊</div>
+        <div class="act-info">
+          <div class="act-title">Weekly Report Generated</div>
+          <div class="act-sub">89% efficiency this week</div>
+        </div>
+        <div class="act-time">1d ago</div>
+      </div>
+    </div>
+    <div class="spacer-bottom"></div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active" onclick="showScreen('home')">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('analytics')">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Analytics</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('iot')">
+        <span class="nav-icon">📡</span>
+        <span class="nav-label">Devices</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('chat')">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">AI Chat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS SCREEN -->
+  <div class="screen" id="screen-analytics">
+    <div class="analytics-header">
+      <h2>Analytics</h2>
+      <p>Composting performance — May 2026</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Decomposition Rate</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Weekly Organic Breakdown (%)</div>
+      <div class="bar-chart">
+        <div class="bar-wrap"><div class="bar-val">42</div><div class="bar" style="height:42px"></div><div class="bar-label">W1</div></div>
+        <div class="bar-wrap"><div class="bar-val">55</div><div class="bar" style="height:55px"></div><div class="bar-label">W2</div></div>
+        <div class="bar-wrap"><div class="bar-val">61</div><div class="bar" style="height:61px"></div><div class="bar-label">W3</div></div>
+        <div class="bar-wrap"><div class="bar-val">78</div><div class="bar highlight" style="height:78px"></div><div class="bar-label">W4</div></div>
+        <div class="bar-wrap"><div class="bar-val">82</div><div class="bar highlight" style="height:82px"></div><div class="bar-label">W5</div></div>
+        <div class="bar-wrap"><div class="bar-val">89</div><div class="bar highlight" style="height:89px"></div><div class="bar-label">W6</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Key Metrics</div>
+    </div>
+    <div class="metric-grid">
+      <div class="metric-box">
+        <div class="m-val">89%</div>
+        <div class="m-lbl">Overall Efficiency</div>
+        <div class="m-trend">↑ 7% this week</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-val">24d</div>
+        <div class="m-lbl">Avg Cycle Time</div>
+        <div class="m-trend">↓ 3d faster</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-val">47kg</div>
+        <div class="m-lbl">Waste Diverted</div>
+        <div class="m-trend">↑ 12kg vs last month</div>
+      </div>
+      <div class="metric-box">
+        <div class="m-val">0.94</div>
+        <div class="m-lbl">AI Accuracy</div>
+        <div class="m-trend">R² prediction score</div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top: 16px;">
+      <div class="section-title">Compost Health Score</div>
+    </div>
+    <div class="chart-card" style="display: flex; align-items: center; gap: 20px;">
+      <div class="progress-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle class="ring-bg" cx="40" cy="40" r="35"/>
+          <circle class="ring-fill" cx="40" cy="40" r="35"/>
+        </svg>
+        <div class="center-text"><div class="pct">75%</div><div class="sub">Health</div></div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Good Condition</div>
+        <div style="font-size:11px;color:var(--text-sub);line-height:1.6;">Temperature: ✅ Optimal<br>Moisture: ✅ Good<br>pH: ⚠️ Slightly high<br>Aeration: ✅ Normal</div>
+      </div>
+    </div>
+
+    <div class="spacer-bottom"></div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('home')">
+        <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item active" onclick="showScreen('analytics')">
+        <span class="nav-icon">📊</span><span class="nav-label">Analytics</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('iot')">
+        <span class="nav-icon">📡</span><span class="nav-label">Devices</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('chat')">
+        <span class="nav-icon">🤖</span><span class="nav-label">AI Chat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- IoT DEVICES SCREEN -->
+  <div class="screen" id="screen-iot">
+    <div class="iot-header">
+      <h2>IoT Devices</h2>
+      <p style="font-size:12px;opacity:0.7;margin-top:2px;">3 devices connected via ESP32</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Compost Bins</div>
+    </div>
+
+    <div class="device-card">
+      <div class="device-header">
+        <div class="device-name">🗂️ Bin #1 — Community A</div>
+        <div class="device-badge">● Online</div>
+      </div>
+      <div class="sensor-row">
+        <span class="sensor-name">Temperature</span>
+        <div class="sensor-reading"><div class="dot ok"></div><span class="val">54°C</span></div>
+      </div>
+      <div class="sensor-row">
+        <span class="sensor-name">Moisture</span>
+        <div class="sensor-reading"><div class="dot ok"></div><span class="val">61%</span></div>
+      </div>
+      <div class="sensor-row">
+        <span class="sensor-name">pH Level</span>
+        <div class="sensor-reading"><div class="dot warn"></div><span class="val">6.8</span></div>
+      </div>
+      <div class="sensor-row">
+        <span class="sensor-name">Last Updated</span>
+        <div class="sensor-reading"><span class="val" style="font-size:12px;color:#6b7280;">2 min ago</span></div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:12px;"><div class="section-title">Bin #2 — Community B</div></div>
+    <div class="device-card">
+      <div class="device-header">
+        <div class="device-name">🗂️ Bin #2 — Community B</div>
+        <div class="device-badge" style="background:#fee2e2;color:#dc2626;">⚠ Alert</div>
+      </div>
+      <div class="sensor-row">
+        <span class="sensor-name">Temperature</span>
+        <div class="sensor-reading"><div class="dot warn"></div><span class="val">68°C</span></div>
+      </div>
+      <div class="sensor-row">
+        <span class="sensor-name">CO₂ Gas</span>
+        <div class="sensor-reading"><div class="dot bad"></div><span class="val">High</span></div>
+      </div>
+      <div class="sensor-row">
+        <span class="sensor-name">Moisture</span>
+        <div class="sensor-reading"><div class="dot ok"></div><span class="val">58%</span></div>
+      </div>
+      <div class="sensor-row">
+        <span class="sensor-name">AI Recommendation</span>
+        <div class="sensor-reading"><span style="font-size:11px;color:#e07a3b;font-weight:600;">Turn Compost</span></div>
+      </div>
+    </div>
+
+    <div class="spacer-bottom"></div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="showScreen('home')">
+        <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('analytics')">
+        <span class="nav-icon">📊</span><span class="nav-label">Analytics</span>
+      </div>
+      <div class="nav-item active" onclick="showScreen('iot')">
+        <span class="nav-icon">📡</span><span class="nav-label">Devices</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('chat')">
+        <span class="nav-icon">🤖</span><span class="nav-label">AI Chat</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI CHAT SCREEN -->
+  <div class="screen" id="screen-chat" style="flex-direction: column;">
+    <div class="chat-header">
+      <div class="chat-avatar">🤖</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;font-family:'Space Grotesk',sans-serif;">CompostAI Assistant</div>
+        <div style="font-size:11px;opacity:0.7;">Powered by ML · Always online</div>
+      </div>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+      <div class="bubble bot">👋 Hi! I'm your composting AI assistant. Ask me anything about your bins, sensor data, or composting tips!</div>
+      <div class="bubble user">Why is Bin 2 temperature so high?</div>
+      <div class="bubble bot">🌡️ Bin #2 is at 68°C — above the ideal 55°C range. This usually means high microbial activity from excess nitrogen (green waste). I recommend:<br><br>1. Turn the compost today<br>2. Add carbon material (dry leaves/cardboard)<br>3. Check moisture — aim for 50-60%</div>
+      <div class="bubble user">When will Bin 1 be ready?</div>
+      <div class="bubble bot">📅 Based on current decomposition rate and sensor trends, my ML model predicts <strong>Bin #1</strong> will be ready in approximately <strong>11–14 days</strong> (around June 1–4). Current efficiency is 89% — great job! 🌱</div>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Ask about your compost..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="chat-send" onclick="sendMsg()">➤</button>
+    </div>
+
+    <div class="bottom-nav" style="margin-top: 0;">
+      <div class="nav-item" onclick="showScreen('home')">
+        <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('analytics')">
+        <span class="nav-icon">📊</span><span class="nav-label">Analytics</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('iot')">
+        <span class="nav-icon">📡</span><span class="nav-label">Devices</span>
+      </div>
+      <div class="nav-item active" onclick="showScreen('chat')">
+        <span class="nav-icon">🤖</span><span class="nav-label">AI Chat</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const body = document.getElementById('chatBody');
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const userBubble = document.createElement('div');
+  userBubble.className = 'bubble user';
+  userBubble.textContent = msg;
+  body.appendChild(userBubble);
+  input.value = '';
+
+  setTimeout(() => {
+    const botBubble = document.createElement('div');
+    botBubble.className = 'bubble bot';
+    const responses = [
+      "📊 Based on today's sensor data, all parameters are within acceptable ranges. Keep monitoring Bin #2 closely.",
+      "🌱 Composting tip: Maintain a 30:1 carbon-to-nitrogen ratio for optimal breakdown. Add more dry browns if the mix feels wet.",
+      "🤖 My prediction model shows 91% compost readiness for Bin #1 by end of next week. Temperature is stable at 54°C.",
+      "💧 Moisture levels look good! Ideal range is 50-60%. Your bins are well-maintained.",
+      "⚡ Real-time data: ESP32 sensors last synced 2 minutes ago. All devices are online."
+    ];
+    botBubble.textContent = responses[Math.floor(Math.random() * responses.length)];
+    body.appendChild(botBubble);
+    body.scrollTop = body.scrollHeight;
+  }, 800);
+
+  body.scrollTop = body.scrollHeight;
+}
+</script>
+</body>
+</html>
