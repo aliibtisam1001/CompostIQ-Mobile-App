@@ -117,16 +117,16 @@ Flutter (Dart) + Firebase Realtime Database + ESP32 MQTT
 ## 📸 Screenshots
 
 ### Home Dashboard
-![Home](assets/screenshot-home.png)
+![Home]([assets/screenshot-home.png](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshot-home.jpeg))
 
 ### Analytics
-![Analytics](assets/screenshot-analytics.png)
+![Analytics](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshot-analytics.jpeg)
 
 ### IoT Devices
-![IoT](assets/screenshot-iot.png)
+![IoT](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshotscreenshot-iot.jpeg)
 
 ### AI Chat
-![Chat](assets/screenshot-chat.png)
+![Chat](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshot-chat.jpeg)
 
 ---
 
