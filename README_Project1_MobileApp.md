@@ -117,13 +117,13 @@ Flutter (Dart) + Firebase Realtime Database + ESP32 MQTT
 ## 📸 Screenshots
 
 ### Home Dashboard
-![Home]([assets/screenshot-home.png](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshot-home.jpeg))
+![Home](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshot-home.jpeg))
 
 ### Analytics
 ![Analytics](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshot-analytics.jpeg)
 
 ### IoT Devices
-![IoT](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshotscreenshot-iot.jpeg)
+![IoT](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshot-iot.jpeg)
 
 ### AI Chat
 ![Chat](https://github.com/aliibtisam1001/CompostIQ-Mobile-App/blob/main/assets/screenshot-chat.jpeg)
@@ -157,7 +157,7 @@ This app is part of the **AI + IoT Smart Composting Research Project** at Albukh
 **Ali Ibtisam**  
 Data Science Undergraduate @ AIU  
 CGPA: 3.89/4.0 | Fully Funded Scholarship  
-📧 ali.ibtisam@student.aiu.edu.my  
+📧 aliibtisam1001@gmail.com  
 🔗 [LinkedIn](https://linkedin.com/in/aliibtisam1001) | [GitHub](https://github.com/aliibtisam1001)
 
 ---
