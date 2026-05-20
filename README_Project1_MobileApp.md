@@ -14,7 +14,7 @@
 
 ## 📱 Live Demo
 
-**Open on your phone:** [GitHub Pages Link](https://yourusername.github.io/compostiq-mobile-app)  
+**Open on your phone:** [GitHub Pages Link](https://aliibtisam1001.github.io/CompostIQ-Mobile-App/Project1_CompostIQ_MobileApp.html)  
 *Or download the HTML file and open it in any mobile browser — it works offline!*
 
 ![App Preview](assets/demo-preview.gif)
@@ -132,7 +132,7 @@ Flutter (Dart) + Firebase Realtime Database + ESP32 MQTT
 
 ## 🧠 AI Integration
 
-The app connects to a **Python ML backend** (see [Project 2](https://github.com/yourusername/compostiq-iot-ml-pipeline)) that provides:
+The app connects to a **Python ML backend** (see [Project 2](https://github.com/aliibtisam1001/compostiq-iot-ml-pipeline)) that provides:
 
 - **Compost readiness prediction** — Random Forest model (R² = 0.94)
 - **Anomaly detection** — Isolation Forest for sensor outliers
@@ -158,7 +158,7 @@ This app is part of the **AI + IoT Smart Composting Research Project** at Albukh
 Data Science Undergraduate @ AIU  
 CGPA: 3.89/4.0 | Fully Funded Scholarship  
 📧 ali.ibtisam@student.aiu.edu.my  
-🔗 [LinkedIn](https://linkedin.com/in/ali-ibtisam) | [GitHub](https://github.com/aliibtisam)
+🔗 [LinkedIn](https://linkedin.com/in/aliibtisam1001) | [GitHub](https://github.com/aliibtisam1001)
 
 ---
 
